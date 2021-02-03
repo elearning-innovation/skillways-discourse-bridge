@@ -1,10 +1,12 @@
 import { getOwner } from 'discourse-common/lib/get-owner'
 
 export default {
-  actions: {
-    createAccount() {
+  setupComponent(_, component) {
+    component.didRender = function createAccountAfterInsert() {
       const controller = getOwner(this).lookup('controller:create-account');
-      controller.send('createAccount')
+      setInterval(function triggerCreateAccount() {
+        controller.send('createAccount')
+      }, 500)
     }
   }
 }
