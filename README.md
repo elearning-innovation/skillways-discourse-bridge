@@ -2,5 +2,6 @@ Handy for starting a local Discourse instance running through Docker for Skillwa
 
 ```
 d/boot_dev -p -e DISCOURSE_DEV_HOSTS=localhost,host.docker.internal -e UNICORN_TIMEOUT=9999
+d/bundle install
 d/unicorn -x
 ```
