@@ -13,10 +13,24 @@ export default {
     withPluginApi('0.11.1', api => {
       const currentUser = api.getCurrentUser()
 
+      function handleMessage(event) {
+        if (event.data.type === 'PROVIDE_DISCUSSION_CONTEXT_INFORMATION') {
+          const {
+            ltiResourceUniqueCategoryIdentifier,
+            templateCategoryId
+          } = event.data
+
+          console.log(ltiResourceUniqueCategoryIdentifier)
+          console.log(templateCategoryId)
+          console.log('check if the category exists')
+        }
+      }
+      window.addEventListener('message', handleMessage)
+
       if (currentUser !== null && window.self !== window.top && window.location.pathname === '/') {
         // Ask for the information needed to clone a context-based discussion from a template if needed, and do the
         // redirect to the correct location in the context-based discussion.
-        window.parent.postMessage({type: 'GET_DISCUSSION_CONTEXT_INFORMATION'}, '*')
+        window.parent.postMessage({type: 'REQUEST_DISCUSSION_CONTEXT_INFORMATION'}, '*')
 
         // window.parent.postMessage({type: 'REDIRECT_REQUEST'}, '*')
 
