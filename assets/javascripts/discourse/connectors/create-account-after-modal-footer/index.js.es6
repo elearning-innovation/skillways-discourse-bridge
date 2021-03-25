@@ -4,7 +4,7 @@ export default {
   setupComponent(_, component) {
     component.didRender = function createAccountDidRender() {
       setTimeout(function triggerCreateAccount() {
-        const controller = getOwner(this).lookup('controller:create-account');
+        const controller = getOwner(this).lookup('controller:create-account')
         controller.send('createAccount')
       }, 2500)
     }
