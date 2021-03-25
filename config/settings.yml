@@ -1,0 +1,3 @@
+plugins:
+  skillways_enabled:
+    default: true

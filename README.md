@@ -6,6 +6,12 @@ d/bundle install && \
 d/unicorn -x
 ```
 
+Use the following to stop the development environment
+
+```
+d/shutdown_dev
+```
+
 Handy links
 
 - /admin - the main admin dashboard route
