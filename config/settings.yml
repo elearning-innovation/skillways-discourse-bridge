@@ -1,3 +1,5 @@
 plugins:
+  api_key:
+    default: ''
   skillways_enabled:
     default: true

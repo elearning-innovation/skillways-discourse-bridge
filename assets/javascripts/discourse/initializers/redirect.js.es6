@@ -13,6 +13,20 @@ export default {
     withPluginApi('0.11.1', api => {
       const currentUser = api.getCurrentUser()
 
+      function getCategory(categoryId) {
+        return ajax(`/c/${categoryId}`, {type: 'GET'})
+      }
+
+      function createCategory(name) {
+        console.log('creating category')
+        const response = ajax('/categories.json', {
+          type: 'POST',
+          data: {name}
+        })
+
+        response.then(response => console.log(response))
+      }
+
       function handleMessage(event) {
         if (event.data.type === 'PROVIDE_DISCUSSION_CONTEXT_INFORMATION') {
           const {
@@ -20,9 +34,21 @@ export default {
             templateCategoryId
           } = event.data
 
-          console.log(ltiResourceUniqueCategoryIdentifier)
-          console.log(templateCategoryId)
-          console.log('check if the category exists')
+          // check if the category exists
+          ajax('/search.json', {
+            type: 'GET',
+            data: {q: ltiResourceUniqueCategoryIdentifier}
+          })
+            .then(searchResultsJson => {
+              if (searchResultsJson.categories.length === 0) {
+                return getCategory(templateCategoryId)
+                  .then(templateCategory => {
+                    console.log(templateCategory)
+
+                    createCategory(ltiResourceUniqueCategoryIdentifier)
+                  })
+              }
+            })
         }
       }
       window.addEventListener('message', handleMessage)
@@ -38,7 +64,7 @@ export default {
           const loadingIndicator = createElementFromHtml(
             `<div style="display: block; background-color: white; width: 100%; height: 100%; border: 0; position: absolute; top: 0; left: 0; z-index: 1001;">`
             + `<div style="font-size: 2em; margin: 30vh auto; height: 2em; text-align: center; width: 25em;">`
-            + `<div class="spinner" style="display: inline-block; width: 0.5em; height: 0.5em; margin: 0; border: 4px solid black; border-radius: 50%; border-right-color: transparent;"></div> Loading discussion &hellip;`
+            + `<div class="spinner" style="display: inline-block; width: 0.5em; height: 0.5em; margin: 0; border: 4px solid black; border-radius: 50%; border-right-color: transparent;"></div> Preparing discussion &hellip;`
             + `</div>`
             + `</div>`
           )
