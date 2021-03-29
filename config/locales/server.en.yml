@@ -1,5 +1,5 @@
 en:
   site_settings:
-    skillways_api_key: "The Discourse API key to use for managing discussions and conversations."
-    skillways_api_user: "The Discourse username of the API key owner."
-    skillways_enabled: "Is the Skillways Discourse Bridge plugin enabled?"
+    skillways_discourse_bridge_api_key: "The Discourse API key to use for managing discussions and conversations."
+    skillways_discourse_bridge_api_user: "The Discourse username of the API key owner."
+    skillways_discourse_bridge_enabled: "Is the Skillways Discourse Bridge plugin enabled?"

@@ -1,10 +1,10 @@
 plugins:
-  skillways_api_key:
+  skillways_discourse_bridge_api_key:
     default: '3a60ee102e750f63903d2b7595d06e6a5df9f4d3a43a09bfd028b3b879c5e6b5'
     client: true
-  skillways_api_user:
+  skillways_discourse_bridge_api_user:
     default: 'system'
     client: true
-  skillways_enabled:
+  skillways_discourse_bridge_enabled:
     default: true
     client: true

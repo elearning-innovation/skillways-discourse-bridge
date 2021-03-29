@@ -3,4 +3,4 @@
 # version: 0.0.3
 # authors: Skillways
 
-enabled_site_setting :skillways_enabled
+enabled_site_setting :skillways_discourse_bridge_enabled
