@@ -25,39 +25,49 @@ function initialize(api, siteSettings) {
         'Accept': 'application/json'
       }
 
-      // check if the category already exists
-      const categoryExistsResponse = await (
-        fetch(`/search.json?q=${ltiResourceUniqueCategoryIdentifier}`, {method: 'GET', headers})
+      // copy the template category
+      const createCategoryResponse = await (
+        fetch('/categories.json', {
+          method: 'POST',
+          headers: {...headers, 'Content-Type': 'application/json'},
+          body: JSON.stringify({name: ltiResourceUniqueCategoryIdentifier})
+        })
           .then(response => response.json())
       )
-      console.log('categoryExistsResponse', categoryExistsResponse)
 
       // create the category if it doesn't exist
-      if (categoryExistsResponse.categories.length === 0) {
-        // copy the template category
-        const createCategoryResponse = await (
-          fetch('/categories.json', {
-            method: 'POST',
-            headers: {...headers, 'Content-Type': 'application/json'},
-            body: JSON.stringify({name: ltiResourceUniqueCategoryIdentifier})
-          })
+      let category = null
+      let categoryId = null
+      if (typeof createCategoryResponse.errors !== 'undefined') { // already created
+        // get all categories
+        const allCategories = await (
+          fetch('/categories.json', {method: 'GET', headers})
             .then(response => response.json())
         )
-        console.log('createCategoryResponse', createCategoryResponse)
 
+        // find the correct category
+        categoryId = allCategories.category_list.categories[
+          allCategories.category_list.categories.findIndex(
+            aCategory => aCategory.name === ltiResourceUniqueCategoryIdentifier
+          )
+        ].id
+
+        category = await (
+          fetch(`/c/${categoryId}.json`, {method: 'GET', headers})
+            .then(response => response.json())
+        )
+      } else {
         // get the new category
         const newCategory = await (
           fetch(`/c/${createCategoryResponse.category.id}.json`, {method: 'GET', headers})
             .then(response => response.json())
         )
-        console.log('newCategory', newCategory)
 
         // lookup the template category
         const templateCategoryResponse = await (
           fetch(`/c/${templateCategoryId}.json`, {method: 'GET', headers})
             .then(response => response.json())
         )
-        console.log('templateCategoryResponse', templateCategoryResponse)
 
         // make sure the topics match
         for (const [topicIndex, topicData] of templateCategoryResponse.topic_list.topics.entries()) {
@@ -66,7 +76,6 @@ function initialize(api, siteSettings) {
             fetch(`/t/${topicData.id}.json`, {method: 'GET', headers})
               .then(response => response.json())
           )
-          console.log('templateTopic', templateTopic)
 
           // upate the initial topic in the newCategory
           if (topicIndex === 0) {
@@ -75,7 +84,6 @@ function initialize(api, siteSettings) {
               fetch(`/t/${newCategory.topic_list.topics[0].id}.json`, {method: 'GET', headers})
                 .then(response => response.json())
             )
-            console.log('initialTopic', initialTopic)
 
             // update the title of the initial topic
             const updateInitialTopicResponse = await (
@@ -85,7 +93,6 @@ function initialize(api, siteSettings) {
                 body: JSON.stringify({title: templateTopic.title})
               })
             )
-            console.log('updateInitalTopicResponse', updateInitialTopicResponse)
 
             // update the first post in the initial topic
             const updateInitialPostResponse = await (
@@ -96,7 +103,6 @@ function initialize(api, siteSettings) {
               })
                 .then(response => response.json())
             )
-            console.log('updateInitialPostResponse', updateInitialPostResponse)
           } else {
             // make a copy of templateTopic within newCategory
             const createTopicResponse = await (
@@ -111,12 +117,21 @@ function initialize(api, siteSettings) {
               })
                 .then(response => response.json())
             )
-            console.log('createTopicResponse', createTopicResponse)
           }
         }
+
+        categoryId = createCategoryResponse.category.id
+        category = await (
+          fetch(`/c/${createCategoryResponse.category.id}.json`, {method: 'GET', headers})
+            .then(response => response.json())
+        )
       }
 
-      // TODO: redirect the user
+      // Redirect the user
+      if (category.topic_list.topics.length < 2) {
+        window.location = `/t/${category.topic_list.topics[0].id}`
+      }
+      window.location =  `/c/${categoryId}`
     }
   }
   window.addEventListener('message', handleMessage)
