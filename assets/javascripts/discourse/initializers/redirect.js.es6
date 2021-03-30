@@ -29,8 +29,8 @@ function initialize(api, siteSettings) {
       const createCategoryResponse = await (
         fetch('/categories.json', {
           method: 'POST',
-          headers: {...headers, 'Content-Type': 'application/json'},
-          body: JSON.stringify({name: ltiResourceUniqueCategoryIdentifier})
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: ltiResourceUniqueCategoryIdentifier })
         })
           .then(response => response.json())
       )
@@ -41,7 +41,7 @@ function initialize(api, siteSettings) {
       if (typeof createCategoryResponse.errors !== 'undefined') { // already created
         // get all categories
         const allCategories = await (
-          fetch('/categories.json', {method: 'GET', headers})
+          fetch('/categories.json', { method: 'GET', headers })
             .then(response => response.json())
         )
 
@@ -53,19 +53,19 @@ function initialize(api, siteSettings) {
         ].id
 
         category = await (
-          fetch(`/c/${categoryId}.json`, {method: 'GET', headers})
+          fetch(`/c/${categoryId}.json`, { method: 'GET', headers })
             .then(response => response.json())
         )
       } else {
         // get the new category
         const newCategory = await (
-          fetch(`/c/${createCategoryResponse.category.id}.json`, {method: 'GET', headers})
+          fetch(`/c/${createCategoryResponse.category.id}.json`, { method: 'GET', headers })
             .then(response => response.json())
         )
 
         // lookup the template category
         const templateCategoryResponse = await (
-          fetch(`/c/${templateCategoryId}.json`, {method: 'GET', headers})
+          fetch(`/c/${templateCategoryId}.json`, { method: 'GET', headers })
             .then(response => response.json())
         )
 
@@ -73,7 +73,7 @@ function initialize(api, siteSettings) {
         for (const [topicIndex, topicData] of templateCategoryResponse.topic_list.topics.entries()) {
           // get the topic from the template category
           const templateTopic = await (
-            fetch(`/t/${topicData.id}.json`, {method: 'GET', headers})
+            fetch(`/t/${topicData.id}.json`, { method: 'GET', headers })
               .then(response => response.json())
           )
 
@@ -81,7 +81,7 @@ function initialize(api, siteSettings) {
           if (topicIndex === 0) {
             // get the existing initial topic
             const initialTopic = await (
-              fetch(`/t/${newCategory.topic_list.topics[0].id}.json`, {method: 'GET', headers})
+              fetch(`/t/${newCategory.topic_list.topics[0].id}.json`, { method: 'GET', headers })
                 .then(response => response.json())
             )
 
@@ -89,8 +89,8 @@ function initialize(api, siteSettings) {
             const updateInitialTopicResponse = await (
               fetch(`/t/-/${initialTopic.id}.json`, {
                 method: 'PUT',
-                headers: {...headers, 'Content-Type': 'application/json'},
-                body: JSON.stringify({title: templateTopic.title})
+                headers: { ...headers, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: templateTopic.title })
               })
             )
 
@@ -98,8 +98,8 @@ function initialize(api, siteSettings) {
             const updateInitialPostResponse = await (
               fetch(`/posts/${initialTopic.post_stream.posts[0].id}.json`, {
                 method: 'PUT',
-                headers: {...headers, 'Content-Type': 'application/json'},
-                body: JSON.stringify({post: {raw: templateTopic.post_stream.posts[0].cooked}})
+                headers: { ...headers, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ post: { raw: templateTopic.post_stream.posts[0].cooked } })
               })
                 .then(response => response.json())
             )
@@ -108,7 +108,7 @@ function initialize(api, siteSettings) {
             const createTopicResponse = await (
               fetch('/posts.json', {
                 method: 'POST',
-                headers: {...headers, 'Content-Type': 'application/json'},
+                headers: { ...headers, 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   title: templateTopic.title,
                   raw: templateTopic.post_stream.posts[0].cooked,
@@ -122,7 +122,7 @@ function initialize(api, siteSettings) {
 
         categoryId = createCategoryResponse.category.id
         category = await (
-          fetch(`/c/${createCategoryResponse.category.id}.json`, {method: 'GET', headers})
+          fetch(`/c/${createCategoryResponse.category.id}.json`, { method: 'GET', headers })
             .then(response => response.json())
         )
       }
@@ -131,7 +131,7 @@ function initialize(api, siteSettings) {
       if (category.topic_list.topics.length < 2) {
         window.location = `/t/${category.topic_list.topics[0].id}`
       }
-      window.location =  `/c/${categoryId}`
+      window.location = `/c/${categoryId}`
     }
   }
   window.addEventListener('message', handleMessage)
@@ -139,7 +139,7 @@ function initialize(api, siteSettings) {
   if (currentUser !== null && window.self !== window.top && window.location.pathname === '/') {
     // Ask for the information needed to clone a context-based discussion from a template if needed, and do the
     // redirect to the correct location in the context-based discussion.
-    window.parent.postMessage({type: 'REQUEST_DISCUSSION_CONTEXT_INFORMATION'}, '*')
+    window.parent.postMessage({ type: 'REQUEST_DISCUSSION_CONTEXT_INFORMATION' }, '*')
 
     if (currentUser.admin !== true) {
       const loadingIndicator = createElementFromHtmlString(
