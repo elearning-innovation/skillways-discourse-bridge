@@ -134,7 +134,7 @@ function initialize(api, siteSettings) {
       window.location = `/c/${categoryId}`
     }
   }
-  window.addEventListener('message', handleMessage)
+  window.addEventListener('message', handleMessage, false)
 
   if (currentUser !== null && window.self !== window.top && window.location.pathname === '/') {
     // Ask for the information needed to clone a context-based discussion from a template if needed, and do the
