@@ -8,6 +8,6 @@ export default {
   name: "skillways-discourse-bridge",
 
   initialize() {
-    withPluginApi("0.8.31", initializeSkillwaysDiscourseBridge);
+    withPluginApi("0.11.1", initializeSkillwaysDiscourseBridge);
   }
 };
