@@ -9,11 +9,11 @@ module SkillwaysDiscourseBridge
       uniqueCategoryIdentifier = params[:uniqueCategoryIdentifier]
 
       categoryExists = Category.exists?(:name => uniqueCategoryIdentifier)
-      unless categoryExists
+      if categoryExists
+        category = Category.where(:name => uniqueCategoryIdentifier)
+      else
         category = Category.new(:name => uniqueCategoryIdentifier)
         # copy topics
-      else
-       category = Category.where(:name => uniqueCategoryIdentifier)
       end
 
       # check the number of topics in the category
