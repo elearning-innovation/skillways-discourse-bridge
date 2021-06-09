@@ -14,10 +14,7 @@ function initialize(api, siteSettings) {
 
   async function handleMessage(event) {
     if (event.data.type === 'PROVIDE_DISCUSSION_CONTEXT_INFORMATION') {
-      const {
-        ltiResourceUniqueCategoryIdentifier,
-        templateCategoryId
-      } = event.data
+      const { uniqueCategoryIdentifier } = event.data
 
       const headers = {
         'Api-Key': apiKey,
@@ -25,113 +22,18 @@ function initialize(api, siteSettings) {
         'Accept': 'application/json'
       }
 
-      // copy the template category
-      const createCategoryResponse = await (
-        fetch('/categories.json', {
-          method: 'POST',
-          headers: { ...headers, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: ltiResourceUniqueCategoryIdentifier })
-        })
-          .then(response => response.json())
+      // get the category by name
+      const getCategoryByNameResponse = await (
+        fetch(`/c/${uniqueCategoryIdentifier}/show.json`, { method: 'GET', headers })
       )
-
-      // create the category if it doesn't exist
-      let category = null
-      let categoryId = null
-      if (typeof createCategoryResponse.errors !== 'undefined') { // already created
-        // get all categories
-        const allCategories = await (
-          fetch('/categories.json', { method: 'GET', headers })
-            .then(response => response.json())
-        )
-
-        // find the correct category
-        categoryId = allCategories.category_list.categories[
-          allCategories.category_list.categories.findIndex(
-            aCategory => aCategory.name === ltiResourceUniqueCategoryIdentifier
-          )
-        ].id
-
-        category = await (
-          fetch(`/c/${categoryId}.json`, { method: 'GET', headers })
-            .then(response => response.json())
-        )
-      } else {
-        // get the new category
-        const newCategory = await (
-          fetch(`/c/${createCategoryResponse.category.id}.json`, { method: 'GET', headers })
-            .then(response => response.json())
-        )
-
-        // lookup the template category
-        const templateCategoryResponse = await (
-          fetch(`/c/${templateCategoryId}.json`, { method: 'GET', headers })
-            .then(response => response.json())
-        )
-
-        // make sure the topics match
-        for (const [topicIndex, topicData] of templateCategoryResponse.topic_list.topics.entries()) {
-          // get the topic from the template category
-          const templateTopic = await (
-            fetch(`/t/${topicData.id}.json`, { method: 'GET', headers })
-              .then(response => response.json())
-          )
-
-          // upate the initial topic in the newCategory
-          if (topicIndex === 0) {
-            // get the existing initial topic
-            const initialTopic = await (
-              fetch(`/t/${newCategory.topic_list.topics[0].id}.json`, { method: 'GET', headers })
-                .then(response => response.json())
-            )
-
-            // update the title of the initial topic
-            const updateInitialTopicResponse = await (
-              fetch(`/t/-/${initialTopic.id}.json`, {
-                method: 'PUT',
-                headers: { ...headers, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title: templateTopic.title })
-              })
-            )
-
-            // update the first post in the initial topic
-            const updateInitialPostResponse = await (
-              fetch(`/posts/${initialTopic.post_stream.posts[0].id}.json`, {
-                method: 'PUT',
-                headers: { ...headers, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ post: { raw: templateTopic.post_stream.posts[0].cooked } })
-              })
-                .then(response => response.json())
-            )
-          } else {
-            // make a copy of templateTopic within newCategory
-            const createTopicResponse = await (
-              fetch('/posts.json', {
-                method: 'POST',
-                headers: { ...headers, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  title: templateTopic.title,
-                  raw: templateTopic.post_stream.posts[0].cooked,
-                  category: createCategoryResponse.category.id
-                })
-              })
-                .then(response => response.json())
-            )
-          }
-        }
-
-        categoryId = createCategoryResponse.category.id
-        category = await (
-          fetch(`/c/${createCategoryResponse.category.id}.json`, { method: 'GET', headers })
-            .then(response => response.json())
-        )
-      }
+      const getCategoryByNameResponseJson = await (getCategoryByNameResponse.json())
+      console.log(getCategoryByNameResponseJson)
 
       // Redirect the user
-      if (category.topic_list.topics.length < 2) {
-        window.location = `/t/${category.topic_list.topics[0].id}`
-      }
-      window.location = `/c/${categoryId}`
+      // if (category.topic_list.topics.length < 2) {
+      //   window.location = `/t/${category.topic_list.topics[0].id}`
+      // }
+      // window.location = `/c/${categoryId}`
     }
   }
   window.addEventListener('message', handleMessage, false)

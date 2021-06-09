@@ -22,7 +22,9 @@ module SkillwaysDiscourseBridge
         templateCategory.topics.each do |topic|
           newTopic = Topic.new(
             category: category,
+            last_post_user_id: Discourse::SYSTEM_USER_ID,
             title: topic.title,
+            user_id: Discourse::SYSTEM_USER_ID,
           )
           newTopic.save!
         end
