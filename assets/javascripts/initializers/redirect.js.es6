@@ -24,16 +24,15 @@ function initialize(api, siteSettings) {
 
       // get the category by name
       const getCategoryByNameResponse = await (
-        fetch(`/c/${uniqueCategoryIdentifier}/show.json`, { method: 'GET', headers })
+        fetch(`/c/${uniqueCategoryIdentifier}.json`, { method: 'GET', headers })
       )
       const getCategoryByNameResponseJson = await (getCategoryByNameResponse.json())
-      console.log(getCategoryByNameResponseJson)
 
       // Redirect the user
-      // if (category.topic_list.topics.length < 2) {
-      //   window.location = `/t/${category.topic_list.topics[0].id}`
-      // }
-      // window.location = `/c/${categoryId}`
+      if (getCategoryByNameResponseJson.topic_list.topics.length < 2) {
+        window.location = `/t/${getCategoryByNameResponseJson.topic_list.topics[0].id}`
+      }
+      window.location = `/c/${uniqueCategoryIdentifier}`
     }
   }
   window.addEventListener('message', handleMessage, false)
