@@ -2,7 +2,7 @@ module SkillwaysDiscourseBridge
   class LogoutController < ::ApplicationController
     requires_plugin SkillwaysDiscourseBridge
 
-    skip_before_action :check_xhr # allow non XHR requests
+    skip_before_action :check_xhr # allow non-XHR requests
     skip_before_action :redirect_to_login_if_required # do not require authentication
 
     def index
@@ -33,10 +33,13 @@ module SkillwaysDiscourseBridge
 
           # update the initially created topic and post on the new category
           if templateTopicIndex === 0
+
+            # update the topic that was automatically created
             firstTopic = category.topics.first()
             firstTopic.title = templateTopic.title
             firstTopic.save!
 
+            # update the post that was automatically created
             firstPost = firstTopic.posts.first()
             firstPost.raw = firstTemplatePostRaw
             firstPost.save!

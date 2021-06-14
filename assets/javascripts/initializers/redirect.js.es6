@@ -7,37 +7,42 @@ function createElementFromHtmlString(htmlString) {
 }
 
 function initialize(api, siteSettings) {
-  const apiKey = siteSettings.skillways_discourse_bridge_api_key
-  const apiUser = siteSettings.skillways_discourse_bridge_api_user
-
   const currentUser = api.getCurrentUser()
 
-  async function handleMessage(event) {
-    if (event.data.type === 'PROVIDE_DISCUSSION_CONTEXT_INFORMATION') {
-      const { uniqueCategoryIdentifier } = event.data
-
-      const headers = {
-        'Api-Key': apiKey,
-        'Api-Username': apiUser,
-        'Accept': 'application/json'
-      }
-
-      // get the category by name
-      const getCategoryByNameResponse = await (
-        fetch(`/c/${uniqueCategoryIdentifier}.json`, { method: 'GET', headers })
-      )
-      const getCategoryByNameResponseJson = await (getCategoryByNameResponse.json())
-
-      // Redirect the user
-      if (getCategoryByNameResponseJson.topic_list.topics.length < 2) {
-        window.location = `/t/${getCategoryByNameResponseJson.topic_list.topics[0].id}`
-      }
-      window.location = `/c/${uniqueCategoryIdentifier}`
-    }
-  }
-  window.addEventListener('message', handleMessage, false)
-
   if (currentUser !== null && window.self !== window.top && window.location.pathname === '/') {
+    const apiKey = siteSettings.skillways_discourse_bridge_api_key
+    const apiUser = siteSettings.skillways_discourse_bridge_api_user
+
+    async function handleMessage(event) {
+      if (event.data.type === 'PROVIDE_DISCUSSION_CONTEXT_INFORMATION') {
+        const { uniqueCategoryIdentifier } = event.data
+
+        const headers = {
+          'Api-Key': apiKey,
+          'Api-Username': apiUser,
+          'Accept': 'application/json'
+        }
+
+        // get the category by name
+        const getCategoryByNameResponse = await (
+          fetch(`/c/${uniqueCategoryIdentifier}.json`, { method: 'GET', headers })
+        )
+        if (getCategoryByNameResponse.status === 200) {
+          const getCategoryByNameResponseJson = await (getCategoryByNameResponse.json())
+
+          // Redirect the user
+          if (typeof getCategoryByNameResponseJson.topic_list !== 'undefined') {
+            if (getCategoryByNameResponseJson.topic_list.topics.length < 2) {
+              window.location = `/t/${getCategoryByNameResponseJson.topic_list.topics[0].id}`
+            } else {
+              window.location = `/c/${uniqueCategoryIdentifier}`
+            }
+          }
+        }
+      }
+    }
+    window.addEventListener('message', handleMessage, false)
+
     // Ask for the information needed to clone a context-based discussion from a template if needed, and do the
     // redirect to the correct location in the context-based discussion.
     window.parent.postMessage({ type: 'REQUEST_DISCUSSION_CONTEXT_INFORMATION' }, '*')
