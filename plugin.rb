@@ -5,10 +5,6 @@
 # version: 0.0.5
 # authors: Skillways
 
-register_asset 'stylesheets/common/skillways-discourse-bridge.scss'
-register_asset 'stylesheets/desktop/skillways-discourse-bridge.scss', :desktop
-register_asset 'stylesheets/mobile/skillways-discourse-bridge.scss', :mobile
-
 enabled_site_setting :skillways_discourse_bridge_enabled
 
 PLUGIN_NAME ||= 'SkillwaysDiscourseBridge'
