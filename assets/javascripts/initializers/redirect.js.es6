@@ -48,7 +48,7 @@ function initialize(api, siteSettings) {
     window.parent.postMessage({ type: 'REQUEST_DISCUSSION_CONTEXT_INFORMATION' }, '*')
 
     const loadingIndicator = createElementFromHtmlString(
-      `<div style="display: block; background-color: white; width: 100%; height: 100%; border: 0; position: absolute; top: 0; left: 0; z-index: 1001;">`
+      `<div style="display: block; background-color: white; width: 100%; height: 100%; border: 0; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1001;">`
       + `<div style="font-size: 2em; margin: 30vh auto; height: 2em; text-align: center; width: 25em;">`
       + `<div class="spinner" style="display: inline-block; width: 0.5em; height: 0.5em; margin: 0; border: 4px solid black; border-radius: 50%; border-right-color: transparent;"></div> Preparing discussion &hellip;`
       + `</div>`
