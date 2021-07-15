@@ -2,7 +2,7 @@
 
 # name: skillways-discourse-bridge
 # about: A plugin to integrate skillways with discourse.
-# version: 1.0.0
+# version: 1.0.1
 # authors: Skillways
 
 enabled_site_setting :skillways_discourse_bridge_enabled
