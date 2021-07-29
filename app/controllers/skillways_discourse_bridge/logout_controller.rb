@@ -1,3 +1,5 @@
+require 'jwt'
+
 module SkillwaysDiscourseBridge
   class LogoutController < ::ApplicationController
     requires_plugin SkillwaysDiscourseBridge
@@ -6,11 +8,42 @@ module SkillwaysDiscourseBridge
     skip_before_action :redirect_to_login_if_required # do not require authentication
 
     def index
-      # clear any previously authenticated user
-      log_off_user
+      jwt = params[:jwt]
+
+      decodedJwt = JWT.decode(
+        jwt,
+        SiteSetting.skillways_discourse_bridge_jwt_secret,
+        true
+      )[0]
+
+      email = decodedJwt['data']['ltiUser']['email']
+      nameFull = decodedJwt['data']['ltiUser']['nameFull']
+
+      userExists = User.with_email(email).count >= 1
+
+      if !userExists
+        user = User.new(
+          active: true,
+          approved: true,
+          email: email,
+          name: nameFull,
+          password: SecureRandom.hex,
+          username: UserNameSuggester.suggest(nameFull),
+        )
+        user.save!
+      else
+        user = User.with_email(email)[0]
+        user.name = nameFull
+        user.save!
+      end
 
       # see if the category already exists
       categoryExists = Category.exists?(:name => params[:uniqueCategoryIdentifier])
+
+      category = nil
+      if categoryExists
+        category = Category.where(name: params[:uniqueCategoryIdentifier])[0]
+      end
 
       # create the category if doesn't exist yet
       unless categoryExists
@@ -67,8 +100,18 @@ module SkillwaysDiscourseBridge
         end
       end
 
-      # start the SSO process
-      redirect_to "/auth/jwt/callback?jwt=#{params[:jwt]}"
+      log_on_user user
+
+      if (category.topics.count === 1)
+        redirect_to "/t/#{category.topics.first().id}"
+      else
+        redirect_to "/c/#{params[:uniqueCategoryIdentifier]}"
+      end
+
+      # render :json => {
+      #   category: category,
+      #   user: user,
+      # }
     end
   end
 end
