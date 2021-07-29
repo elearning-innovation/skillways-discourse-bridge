@@ -3,3 +3,4 @@ en:
     skillways_discourse_bridge_api_key: "The Discourse API key to use for managing discussions."
     skillways_discourse_bridge_api_user: "The Discourse username of the API key owner."
     skillways_discourse_bridge_enabled: "Is the Skillways Discourse Bridge plugin enabled?"
+    skillways_discourse_bridge_jwt_secret: "The JWT secret used to sign tokens."
