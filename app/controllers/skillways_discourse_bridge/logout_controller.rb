@@ -14,11 +14,31 @@ module SkillwaysDiscourseBridge
         jwt,
         SiteSetting.skillways_discourse_bridge_jwt_secret,
         true
-      )
+      )[0]
+
+      email = decodedJwt['data']['ltiUser']['email']
+      nameFull = decodedJwt['data']['ltiUser']['nameFull']
+
+      userExists = User.with_email(email).count >= 1
+
+      if !userExists
+        user = User.new(
+          email: email,
+          name: nameFull,
+          password: SecureRandom.hex,
+          username: UserNameSuggester.suggest(nameFull),
+        )
+        user.save!
+      else
+        user = User.with_email(email)[0]
+        user.name = nameFull
+        user.save!
+      end
 
       render :json => {
         decodedJwt: decodedJwt,
         jwt: jwt,
+        user: user,
       }
       # # clear any previously authenticated user
       # log_off_user
