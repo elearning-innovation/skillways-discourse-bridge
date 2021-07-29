@@ -8,3 +8,5 @@ plugins:
   skillways_discourse_bridge_enabled:
     default: true
     client: true
+  skillways_discourse_bridge_jwt_secret:
+    default: 'T/2+uc+p1QTEE7Q0+xDzSHcxdf1yEnA1YWKJs1rKjf3AwjW56JfVDnrUHW6elUMdKv4FGQbls77NO8N1C6kUVA=='

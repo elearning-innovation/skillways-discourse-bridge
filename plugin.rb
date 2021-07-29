@@ -5,6 +5,8 @@
 # version: 1.0.1
 # authors: Skillways
 
+gem 'jwt', '2.2.3'
+
 enabled_site_setting :skillways_discourse_bridge_enabled
 
 PLUGIN_NAME ||= 'SkillwaysDiscourseBridge'
