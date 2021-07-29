@@ -16,8 +16,14 @@ module SkillwaysDiscourseBridge
         true
       )[0]
 
-      email = decodedJwt['data']['ltiUser']['email']
-      nameFull = decodedJwt['data']['ltiUser']['nameFull']
+      jwtType = decodedJwt['data']['type']
+      if jwtType === 'access'
+        email = decodedJwt['data']['user']['email']
+        nameFull = decodedJwt['data']['user']['firstName'] + ' ' + decodedJwt['data']['user']['lastName']
+      elsif jwtType === 'lti-access'
+        email = decodedJwt['data']['ltiUser']['email']
+        nameFull = decodedJwt['data']['ltiUser']['nameFull']
+      end
 
       userExists = User.with_email(email).count >= 1
 
@@ -108,9 +114,9 @@ module SkillwaysDiscourseBridge
         redirect_to "/c/#{params[:uniqueCategoryIdentifier]}"
       end
 
+      # how to output some debug data
       # render :json => {
-      #   category: category,
-      #   user: user,
+      #   decodedJwt: decodedJwt,
       # }
     end
   end
