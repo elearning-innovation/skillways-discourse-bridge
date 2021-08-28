@@ -46,9 +46,26 @@ module SkillwaysDiscourseBridge
       # see if the category already exists
       categoryExists = Category.exists?(:name => params[:uniqueCategoryIdentifier])
 
+      # fetch the template category that we want to copy
+      templateCategory = Category.find(params[:templateCategoryId])
+
       category = nil
       if categoryExists
         category = Category.where(name: params[:uniqueCategoryIdentifier])[0]
+
+        # loop through the template category's topics
+        templateCategory.topics.each_with_index do |templateTopic, templateTopicIndex|
+          # update the topic
+          topic = category.topics[templateTopicIndex]
+          topic.title = templateTopic.title
+          topic.save!
+
+          # update the initial post in the topic
+          templatePostRaw = templateTopic.posts.first().raw
+          post = topic.posts.first()
+          post.raw = templatePostRaw
+          post.save!
+        end
       end
 
       # create the category if doesn't exist yet
@@ -60,9 +77,6 @@ module SkillwaysDiscourseBridge
           user_id: Discourse::SYSTEM_USER_ID,
         )
         category.save!
-
-        # fetch the template category that we want to copy
-        templateCategory = Category.find(params[:templateCategoryId])
 
         # loop through the template category's topics
         templateCategory.topics.each_with_index do |templateTopic, templateTopicIndex|
