@@ -39,6 +39,7 @@ module SkillwaysDiscourseBridge
         user.save!
       else
         user = User.with_email(email)[0]
+        user.email = email
         user.name = nameFull
         user.save!
       end
@@ -49,44 +50,26 @@ module SkillwaysDiscourseBridge
       # fetch the template category that we want to copy
       templateCategory = Category.find(params[:templateCategoryId])
 
+      # fetch or create the category as needed
       category = nil
       if categoryExists
         category = Category.where(name: params[:uniqueCategoryIdentifier])[0]
-
-        # loop through the template category's topics
-        templateCategory.topics.each_with_index do |templateTopic, templateTopicIndex|
-          # update the topic
-          topic = category.topics[templateTopicIndex]
-          topic.title = templateTopic.title
-          topic.save!
-
-          # update the initial post in the topic
-          templatePostRaw = templateTopic.posts.first().raw
-          post = topic.posts.first()
-          post.raw = templatePostRaw
-          post.save!
-        end
-      end
-
-      # create the category if doesn't exist yet
-      unless categoryExists
-
-        # create the new category
+      else
         category = Category.new(
           name: params[:uniqueCategoryIdentifier],
           user_id: Discourse::SYSTEM_USER_ID,
         )
         category.save!
+      end
 
+      if !templateCategory.nil? && !category.nil?
         # loop through the template category's topics
-        templateCategory.topics.each_with_index do |templateTopic, templateTopicIndex|
-
+        sortedTemplateTopics = templateCategory.topics.sort_by { |topic| topic.id }
+        sortedTemplateTopics.each_with_index do |templateTopic, templateTopicIndex|
           # grab the first post in the template topic
           firstTemplatePostRaw = templateTopic.posts.first().raw
 
-          # update the initially created topic and post on the new category
           if templateTopicIndex === 0
-
             # update the topic that was automatically created
             firstTopic = category.topics.first()
             firstTopic.title = templateTopic.title
@@ -96,26 +79,49 @@ module SkillwaysDiscourseBridge
             firstPost = firstTopic.posts.first()
             firstPost.raw = firstTemplatePostRaw
             firstPost.save!
-
-          # copy the topic and initial post into the new category
           else
+            topic = nil
 
-            # create the new topic
-            topic = Topic.new(
-              category: category,
-              last_post_user_id: Discourse::SYSTEM_USER_ID,
-              title: templateTopic.title,
-              user_id: Discourse::SYSTEM_USER_ID,
-            )
-            topic.save!
+            sortedTopics = category.topics.sort_by { |topic| topic.id }
+            if sortedTopics[templateTopicIndex].nil?
+              # create the topic
+              topic = Topic.new(
+                category: category,
+                last_post_user_id: Discourse::SYSTEM_USER_ID,
+                title: templateTopic.title,
+                user_id: Discourse::SYSTEM_USER_ID,
+              )
+              topic.save!
+            else
+              # update the topic
+              topic = category.topics[templateTopicIndex]
+              topic.title = templateTopic.title
+              topic.save!
+            end
 
-            # create the new post
-            post = Post.new(
-              topic: topic,
-              raw: firstTemplatePostRaw,
-              user_id: Discourse::SYSTEM_USER_ID,
-            )
-            post.save!
+            if !topic.nil?
+              # sort all posts
+              sortedPosts = topic.posts.sort_by { |post| post.post_number }
+              sortedTemplatePosts = templateTopic.posts.sort_by { |post| post.post_number }
+
+              sortedTemplatePosts.each_with_index do |templatePost, templatePostIndex|
+                if sortedPosts[templateTopicIndex].nil?
+                  # create the post
+                  post = Post.new(
+                    raw: templatePost.raw,
+                    topic: topic,
+                    user_id: Discourse::SYSTEM_USER_ID,
+                  )
+                  post.save!
+                else
+                  # update the post
+                  post = sortedPosts[templatePostIndex]
+                  post.raw = templatePost.raw
+                  post.topic = topic
+                  post.save!
+                end
+              end
+            end
           end
         end
       end
@@ -130,7 +136,7 @@ module SkillwaysDiscourseBridge
 
       # how to output some debug data
       # render :json => {
-      #   decodedJwt: decodedJwt,
+      #   debugData: debugData,
       # }
     end
   end
