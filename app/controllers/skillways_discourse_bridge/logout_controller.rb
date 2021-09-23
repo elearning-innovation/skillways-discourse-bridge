@@ -94,7 +94,7 @@ module SkillwaysDiscourseBridge
               topic.save!
             else
               # update the topic
-              topic = category.topics[templateTopicIndex]
+              topic = sortedTopics[templateTopicIndex]
               topic.title = templateTopic.title
               topic.save!
             end
