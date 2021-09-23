@@ -105,7 +105,7 @@ module SkillwaysDiscourseBridge
               sortedTemplatePosts = templateTopic.posts.sort_by { |post| post.post_number }
 
               sortedTemplatePosts.each_with_index do |templatePost, templatePostIndex|
-                if sortedPosts[templateTopicIndex].nil?
+                if sortedPosts[templatePostIndex].nil?
                   # create the post
                   post = Post.new(
                     raw: templatePost.raw,
