@@ -5,7 +5,7 @@
 # version: 1.1.2
 # authors: Skillways
 
-gem 'jwt', '2.2.3'
+gem 'jwt', '2.3.0'
 
 enabled_site_setting :skillways_discourse_bridge_enabled
 
