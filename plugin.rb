@@ -13,3 +13,8 @@ enabled_site_setting :skillways_discourse_bridge_enabled
 PLUGIN_NAME ||= 'SkillwaysDiscourseBridge'
 
 load File.expand_path('lib/skillways-discourse-bridge/engine.rb', __dir__)
+
+after_initialize do
+  load File.expand_path('../current_user_provider.rb', __FILE__)
+  Discourse.current_user_provider = SkillwaysCurrentUserProvider
+end
