@@ -3,8 +3,8 @@ class SkillwaysCurrentUserProvider < Auth::DefaultCurrentUserProvider
     hash = {
       value: unhashed_auth_token,
       httponly: true,
-      secure: SiteSetting.force_https
-      domain: :all,
+      secure: SiteSetting.force_https,
+      domain: :all
     }
 
     if SiteSetting.persistent_sessions
