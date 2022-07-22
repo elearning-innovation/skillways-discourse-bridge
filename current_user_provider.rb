@@ -4,7 +4,7 @@ class SkillwaysCurrentUserProvider < Auth::DefaultCurrentUserProvider
       value: unhashed_auth_token,
       httponly: true,
       secure: SiteSetting.force_https,
-      domain: :all
+      domain: '*.google.com'
     }
 
     if SiteSetting.persistent_sessions
