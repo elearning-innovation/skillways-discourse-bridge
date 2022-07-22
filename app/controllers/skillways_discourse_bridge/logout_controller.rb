@@ -1,5 +1,33 @@
 require 'jwt'
 
+class Auth::DefaultCurrentUserProvider
+  def set_auth_cookie!(unhashed_auth_token, user, cookie_jar)
+    data = {
+      token: unhashed_auth_token,
+      user_id: user.id,
+      trust_level: user.trust_level,
+      issued_at: Time.zone.now.to_i
+    }
+
+    if SiteSetting.persistent_sessions
+      expires = SiteSetting.maximum_session_age.hours.from_now
+    end
+
+    if SiteSetting.same_site_cookies != "Disabled"
+      same_site = SiteSetting.same_site_cookies
+    end
+
+    cookie_jar.encrypted[TOKEN_COOKIE] = {
+      value: data,
+      httponly: true,
+      secure: SiteSetting.force_https,
+      expires: expires,
+      same_site: same_site,
+      domain: :all
+    }
+  end
+end
+
 module SkillwaysDiscourseBridge
   class LogoutController < ::ApplicationController
     requires_plugin SkillwaysDiscourseBridge
