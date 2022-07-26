@@ -2,7 +2,7 @@
 
 # name: skillways-discourse-bridge
 # about: A plugin to integrate skillways with discourse.
-# version: 1.2.0
+# version: 1.3.0
 # authors: Skillways
 
 #gem 'jwt', '2.2.3' # local dev
