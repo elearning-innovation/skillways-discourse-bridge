@@ -46,10 +46,10 @@ module SkillwaysDiscourseBridge
 
       jwtType = decodedJwt['data']['type']
       if jwtType === 'access'
-        email = decodedJwt['data']['user']['email']
+        email = decodedJwt['data']['user']['email'].downcase
         nameFull = decodedJwt['data']['user']['firstName'] + ' ' + decodedJwt['data']['user']['lastName']
       elsif jwtType === 'lti-access'
-        email = decodedJwt['data']['ltiUser']['email']
+        email = decodedJwt['data']['ltiUser']['email'].downcase
         nameFull = decodedJwt['data']['ltiUser']['nameFull']
       end
 
