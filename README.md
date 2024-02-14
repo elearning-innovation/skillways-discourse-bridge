@@ -1,16 +1,13 @@
-Handy for starting a local Discourse instance running through Docker for Skillways on macOS.
+skillways-discourse-bridge
+==========================
 
-```
-d/boot_dev -p -e DISCOURSE_DEV_HOSTS=localhost,host.docker.internal -e NO_EMBER_CLI=1 && d/bundle install && d/unicorn
-```
+Setup & Usage
+-------------
 
-Use the following to stop the development environment
+TODO: Complete this section. Advise setting up a local non-Docker installation for performance reasons and link to the pertinent documentation.
 
-```
-d/shutdown_dev
-```
-
-Handy links
+Handy Links
+-----------
 
 - /admin - the main admin dashboard route
-- http://localhost:9292/ - the location of the local development discourse instance
+- http://localhost:4200/ - the location of the local development discourse instance
