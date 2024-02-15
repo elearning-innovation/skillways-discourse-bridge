@@ -1,6 +1,6 @@
 plugins:
   skillways_discourse_bridge_api_key:
-    default: '3a60ee102e750f63903d2b7595d06e6a5df9f4d3a43a09bfd028b3b879c5e6b5'
+    default: '<place-api-key-here>'
     client: true
   skillways_discourse_bridge_api_user:
     default: 'system'
@@ -9,4 +9,4 @@ plugins:
     default: true
     client: true
   skillways_discourse_bridge_jwt_secret:
-    default: 'T/2+uc+p1QTEE7Q0+xDzSHcxdf1yEnA1YWKJs1rKjf3AwjW56JfVDnrUHW6elUMdKv4FGQbls77NO8N1C6kUVA=='
+    default: '<place-jwt-secret-here>'
